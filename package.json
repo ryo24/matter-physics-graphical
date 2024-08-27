@@ -1,0 +1,22 @@
+{
+  "name": "matter-physics-graphical",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryo24/matter-physics-graphical.git"
+  },
+  "author": "Ryo Yamamoto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryo24/matter-physics-graphical/issues"
+  },
+  "homepage": "https://github.com/ryo24/matter-physics-graphical#readme",
+  "description": "",
+  "dependencies": {
+    "matter-tools": "^0.14.0"
+  }
+}
