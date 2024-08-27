@@ -7,7 +7,9 @@ const Engine = Matter.Engine,
       MouseConstraint = Matter.MouseConstraint,
       Runner = Matter.Runner,
       Constraint = Matter.Constraint,
-      Events = Matter.Events;
+      Events = Matter.Events,
+      Composite = Matter.Composite,
+      Composites = Matter.Composites;
 
 // エンジンを作成
 const engine = Engine.create();
@@ -86,7 +88,7 @@ const box = Bodies.rectangle(400, 300, 60, 40, { // サイズを変更
 World.add(world, [ground, slope, box]);
 
 
-// 正方形と2本のバネ接続（正方形の表面と空間点の接続）【⑥】
+// 正方形と2本のバネ接続（正方形の表面と空間点の接続）
 const boundSquare = Bodies.rectangle(400, 150, 100, 100,{
     render: {
         fillStyle: '#6ab04c'
@@ -106,6 +108,57 @@ const constraint2Right = Constraint.create({
     stiffness: 0.01
 });
 World.add(world, [boundSquare, constraint2Left, constraint2Right]);
+
+
+
+// 鎖の実装
+// 鎖のように連なる円を作成
+const group = Matter.Body.nextGroup(true); // グループを作成
+
+// 円の直径を15に設定
+const circleDiameter = 15;
+
+// 初期位置と円の個数
+const initialX = 750;
+const initialY = 200;
+const numberOfCircles = 10;
+
+// Composites.stackを使用して円を作成
+const chain = Composites.stack(initialX, initialY, numberOfCircles, 1, 0, 0, (x, y) => {
+    return Bodies.circle(x, y, circleDiameter / 2, {
+        collisionFilter: { group: group },
+        render: {
+            fillStyle: '#6ab04c'
+        }
+    });
+});
+
+// Composites.chainを使用して円を連結
+Composites.chain(chain, 0, 0, 1, 0, {
+    stiffness: 1,
+    length: 0.1, // 隣接させるために長さを0に設定
+    render: {
+        visible: false
+    }
+});
+
+// 鎖全体をワールドに追加
+World.add(world, chain);
+// 両端を固定する場合、以下を使用
+World.add(world, [
+    Constraint.create({
+        bodyB: chain.bodies[0],
+        pointB: { x: -circleDiameter / 2, y: 0 },
+        pointA: { x: initialX - circleDiameter / 2, y: initialY },
+        stiffness: 0.05
+    }),
+    Constraint.create({
+        bodyB: chain.bodies[chain.bodies.length - 1],
+        pointB: { x: circleDiameter / 2, y: 0 },
+        pointA: { x: initialX + (numberOfCircles - 1) * circleDiameter, y: initialY },
+        stiffness: 0.5
+    })
+]);
 
 
 // エンジンを実行
