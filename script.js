@@ -5,7 +5,9 @@ const Engine = Matter.Engine,
       Bodies = Matter.Bodies,
       Mouse = Matter.Mouse,
       MouseConstraint = Matter.MouseConstraint,
-      Runner = Matter.Runner;
+      Runner = Matter.Runner,
+      Constraint = Matter.Constraint,
+      Events = Matter.Events;
 
 // エンジンを作成
 const engine = Engine.create();
@@ -83,6 +85,29 @@ const box = Bodies.rectangle(400, 300, 60, 40, { // サイズを変更
 // すべてのボディをワールドに追加
 World.add(world, [ground, slope, box]);
 
+
+// 正方形と2本のバネ接続（正方形の表面と空間点の接続）【⑥】
+const boundSquare = Bodies.rectangle(400, 150, 100, 100,{
+    render: {
+        fillStyle: '#6ab04c'
+    }
+});
+
+const constraint2Left = Constraint.create({
+    pointA: { x: 50, y: 100 },
+    bodyB: boundSquare,
+    pointB: { x: -50, y: 0 },
+    stiffness: 0.01
+  });
+const constraint2Right = Constraint.create({
+    pointA: { x: 750, y: 100 },
+    bodyB: boundSquare,
+    pointB: { x: 50, y: 0 },
+    stiffness: 0.01
+});
+World.add(world, [boundSquare, constraint2Left, constraint2Right]);
+
+
 // エンジンを実行
 Engine.run(engine);
 
@@ -91,3 +116,12 @@ Render.lookAt(render, {
     min: { x: 0, y: 0 },
     max: { x: 800, y: 600 }
 });
+
+
+
+// mousemoveイベントを設定してマウスの座標、ドラッグ対象を表示する【④】
+Events.on(mouseConstraint, 'mousemove', e => {
+    $('p.coordinate').text(`X: ${e.mouse.position.x} Y: ${e.mouse.position.y}`);
+    const label = mouseConstraint.body ? mouseConstraint.body.label : '';
+    $('p.target').text(`Dragging ${label}`);
+  });
